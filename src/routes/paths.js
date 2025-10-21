@@ -40,4 +40,5 @@ export const PATHS = {
   // Settings & Auth
   SETTINGS: "/settings",
   AUTH_LOGIN: "/auth/login",
+  AUTH_LOGOUT: "/auth/logout",
 };

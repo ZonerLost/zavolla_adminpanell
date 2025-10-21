@@ -4,73 +4,106 @@ import AdminLayout from "../layouts/AdminLayout";
 import { PATHS } from "./paths";
 import Loading from "../components/Loading";
 
+// helper that validates the resolved module default export is renderable
+function safeLazy(loader) {
+  return lazy(() =>
+    loader().then((mod) => {
+      const d = mod && mod.default;
+      const ok =
+        typeof d === "function" || (typeof d === "object" && d !== null);
+      if (!ok) {
+        // try to extract the import path from the loader's source for debugging
+        let label = "<unknown>";
+        try {
+          const s = loader.toString();
+          const m = s.match(/import\((?:'|\")([^'\"]+)(?:'|\")\)/);
+          if (m) label = m[1];
+        } catch (e) {
+          /* ignore */
+        }
+        // throw an informative error that includes the module path and the resolved keys
+        const keys = Object.keys(mod || {}).join(",");
+        throw new Error(
+          `Lazy-loaded module "${label}" does not export a React component as default. Resolved keys: ${keys}`
+        );
+      }
+      return mod;
+    })
+  );
+}
+
 // Lazy imports for primary pages
-const Dashboard = lazy(() => import("../modules/dashboard/Dashboard.jsx"));
+const Dashboard = safeLazy(() => import("../modules/dashboard/Dashboard.jsx"));
 
 /* Integrations */
-const PartnersList = lazy(() =>
+const PartnersList = safeLazy(() =>
   import("../modules/integrations/partners/List.jsx")
 );
-const MenuSync = lazy(() => import("../modules/integrations/menus/Sync.jsx"));
-const DeliveryFeed = lazy(() =>
+const MenuSync = safeLazy(() =>
+  import("../modules/integrations/menus/Sync.jsx")
+);
+const DeliveryFeed = safeLazy(() =>
   import("../modules/integrations/orders/Feed.jsx")
 );
-const WebhookLogs = lazy(() =>
+const WebhookLogs = safeLazy(() =>
   import("../modules/integrations/webhooks/Logs.jsx")
 );
 
 /* Hardware */
-const HardwareHealth = lazy(() =>
+const HardwareHealth = safeLazy(() =>
   import("../modules/hardware/health/Overview.jsx")
 );
-const TerminalsList = lazy(() =>
+const TerminalsList = safeLazy(() =>
   import("../modules/hardware/terminals/List.jsx")
 );
-const PrintersList = lazy(() =>
+const PrintersList = safeLazy(() =>
   import("../modules/hardware/printers/List.jsx")
 );
 
 /* Sales */
-const OrdersList = lazy(() => import("../modules/sales/orders/List.jsx"));
-const PaymentSessions = lazy(() =>
+const OrdersList = safeLazy(() => import("../modules/sales/orders/List.jsx"));
+const PaymentSessions = safeLazy(() =>
   import("../modules/sales/payments/Sessions.jsx")
 );
-const TablesBoard = lazy(() => import("../modules/sales/tables/Board.jsx"));
+const TablesBoard = safeLazy(() => import("../modules/sales/tables/Board.jsx"));
 
 /* Biz catalog */
-const BusinessesList = lazy(() =>
+const BusinessesList = safeLazy(() =>
   import("../modules/biz-catalog/businesses/List.jsx")
 );
-const LocationsList = lazy(() =>
+const LocationsList = safeLazy(() =>
   import("../modules/biz-catalog/locations/List.jsx")
 );
-const AreasTablesEditor = lazy(() =>
+const AreasTablesEditor = safeLazy(() =>
   import("../modules/biz-catalog/locations/AreasTablesEditor.jsx")
 );
-const CategoriesList = lazy(() =>
+const CategoriesList = safeLazy(() =>
   import("../modules/biz-catalog/categories/List.jsx")
 );
-const ItemsList = lazy(() => import("../modules/biz-catalog/items/List.jsx"));
-const MenusBuilder = lazy(() =>
+const ItemsList = safeLazy(() =>
+  import("../modules/biz-catalog/items/List.jsx")
+);
+const MenusBuilder = safeLazy(() =>
   import("../modules/biz-catalog/menus/Builder.jsx")
 );
-const DiscountsList = lazy(() =>
+const DiscountsList = safeLazy(() =>
   import("../modules/biz-catalog/discounts/List.jsx")
 );
 
 /* IAM */
-const UsersList = lazy(() => import("../modules/iam/users/UsersList.jsx"));
-const InvitesList = lazy(() =>
+const UsersList = safeLazy(() => import("../modules/iam/users/UsersList.jsx"));
+const InvitesList = safeLazy(() =>
   import("../modules/iam/invites/InvitesList.jsx")
 );
-const RolesPage = lazy(() => import("../modules/iam/roles/RolesPage.jsx"));
-const PoliciesPage = lazy(() =>
+const RolesPage = safeLazy(() => import("../modules/iam/roles/RolesPage.jsx"));
+const PoliciesPage = safeLazy(() =>
   import("../modules/iam/policies/PoliciesPage.jsx")
 );
 
 /* Settings & Auth */
-const Settings = lazy(() => import("../modules/settings/Settings.jsx"));
-const Login = lazy(() => import("../modules/auth/login.jsx"));
+const Settings = safeLazy(() => import("../modules/settings/Settings.jsx"));
+const Login = safeLazy(() => import("../modules/auth/login.jsx"));
+const Logout = safeLazy(() => import("../modules/auth/logout.jsx"));
 
 const router = createBrowserRouter([
   {
@@ -294,15 +327,25 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      {
-        path: PATHS.AUTH_LOGIN.slice(1),
-        element: (
-          <Suspense fallback={<Loading />}>
-            <Login />
-          </Suspense>
-        ),
-      },
+      // (auth routes moved to top-level so they render without the AdminLayout)
     ],
+  },
+  // Top-level auth routes (render outside AdminLayout)
+  {
+    path: PATHS.AUTH_LOGIN,
+    element: (
+      <Suspense fallback={<Loading />}>
+        <Login />
+      </Suspense>
+    ),
+  },
+  {
+    path: PATHS.AUTH_LOGOUT,
+    element: (
+      <Suspense fallback={<Loading />}>
+        <Logout />
+      </Suspense>
+    ),
   },
   { path: "*", element: <div className="card p-8">Not Found</div> },
 ]);

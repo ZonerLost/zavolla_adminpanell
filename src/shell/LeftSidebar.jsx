@@ -11,6 +11,7 @@ import {
   MdLocalShipping,
   MdReceiptLong,
   MdSettings,
+  MdExitToApp,
 } from "react-icons/md";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 
@@ -47,7 +48,10 @@ const NAV_SECTIONS = [
   },
   {
     title: "System",
-    items: [{ icon: MdSettings, label: "Settings", path: "/settings" }],
+    items: [
+      { icon: MdSettings, label: "Settings", path: "/settings" },
+      { icon: MdExitToApp, label: "Logout", path: "/auth/logout" },
+    ],
   },
 ];
 
