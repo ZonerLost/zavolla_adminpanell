@@ -98,7 +98,6 @@ export default function TerminalsList() {
                 <th className="px-3 py-2">Model / Serial</th>
                 <th className="px-3 py-2">Location</th>
                 <th className="px-3 py-2">Status</th>
-                <th className="px-3 py-2">Battery</th>
                 <th className="px-3 py-2">Firmware</th>
                 <th className="px-3 py-2">Last seen</th>
                 <th className="px-3 py-2 text-right">Actions</th>
@@ -107,13 +106,13 @@ export default function TerminalsList() {
             <tbody>
               {!rows && (
                 <>
-                  <SkeletonRow cols={8} />
-                  <SkeletonRow cols={8} />
+                  <SkeletonRow cols={7} />
+                  <SkeletonRow cols={7} />
                 </>
               )}
               {rows && rows.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-3 py-10 text-center text-muted">
+                  <td colSpan={7} className="px-3 py-10 text-center text-muted">
                     No terminals.
                   </td>
                 </tr>
@@ -145,7 +144,6 @@ export default function TerminalsList() {
                         {t.status}
                       </span>
                     </td>
-                    <td className="px-3 py-3">{t.battery ?? "-"}%</td>
                     <td className="px-3 py-3">{t.firmware}</td>
                     <td className="px-3 py-3">
                       {new Date(t.lastSeen).toLocaleString()}

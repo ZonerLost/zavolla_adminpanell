@@ -71,7 +71,6 @@ export default function HardwareHealth() {
                 <tr>
                   <th className="px-3 py-2">Alias</th>
                   <th className="px-3 py-2">Status</th>
-                  <th className="px-3 py-2">Battery</th>
                   <th className="px-3 py-2 text-right">Actions</th>
                 </tr>
               </thead>
@@ -79,7 +78,7 @@ export default function HardwareHealth() {
                 {!terms && (
                   <tr>
                     <td
-                      colSpan={4}
+                      colSpan={3}
                       className="px-3 py-6 text-center text-muted"
                     >
                       Loading…
@@ -95,7 +94,6 @@ export default function HardwareHealth() {
                     >
                       <td className="px-3 py-2">{t.alias || t.serial}</td>
                       <td className="px-3 py-2 capitalize">{t.status}</td>
-                      <td className="px-3 py-2">{t.battery ?? "-"}%</td>
                       <td className="px-3 py-2 text-right">
                         <button
                           className="btn-ghost"
@@ -109,7 +107,7 @@ export default function HardwareHealth() {
                 {terms && terms.length === 0 && (
                   <tr>
                     <td
-                      colSpan={4}
+                      colSpan={3}
                       className="px-3 py-6 text-center text-muted"
                     >
                       No terminals.
